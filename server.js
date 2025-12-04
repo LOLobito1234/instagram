@@ -27,15 +27,16 @@ const transporter = nodemailer.createTransport({
         user: 'paschasin1234@gmail.com',
         pass: process.env.GMAIL_PASSWORD // Tu contraseña de aplicación
     },
+    family: 4,
+    logger: true,
+    debug: true,
     tls: {
-        // Esto permite la conexión incluso si el certificado de Google
-        // tiene problemas de validación con la IP de Render
+       
         rejectUnauthorized: false 
     },
     // Opciones para evitar que se quede colgado eternamente
     connectionTimeout: 10000, // 10 segundos máximo para conectar
-    greetingTimeout: 5000,    // 5 segundos esperando el saludo
-    socketTimeout: 10000      // 10 segundos sin actividad cierra el socket
+  
 });
 
 // Verificación inicial (Solo informativa, no detiene la app si falla al inicio)
