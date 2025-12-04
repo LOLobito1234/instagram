@@ -50,6 +50,6 @@ app.post('/login', (req, res) => {
 // --- 3. PUERTO DINÁMICO (CRUCIAL PARA RENDER) ---
 // Render te asigna un puerto automáticamente en la variable process.env.PORT
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
+app.listen(PORT,'0.0.0.0', () => {
     console.log(`Servidor corriendo en el puerto ${PORT}`);
 });
