@@ -1,16 +1,25 @@
-require('dotenv').config();
+import express from 'express';
+import { Resend } from 'resend';
+import cors from 'cors';
+import bodyParser from 'body-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
+import dotenv from 'dotenv';
 
-const express = require('express');
-const { Resend } = require('resend');
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+// 1. Configurar dotenv
+dotenv.config();
+
+// 2. Definir __dirname manualmente (necesario para "type": "module")
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+
+// 3. Ahora sí podemos usar __dirname
 app.use(express.static(path.join(__dirname, 'public')));
 
 const resend = new Resend(process.env.RESEND_API_KEY);
