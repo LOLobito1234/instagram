@@ -246,8 +246,9 @@ main {
 }
 
 .forgot-password {
-    color: #00376b; /* Corregido a azul oscuro típico, antes era black */
-    font-size: 12px;
+    color: #000000; /* Corregido a azul oscuro típico, antes era black */
+    font-size: 14px;
+    font-weight: 600;
     text-decoration: none;
     margin-top: 12px;
 }
