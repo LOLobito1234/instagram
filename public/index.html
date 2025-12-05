@@ -24,18 +24,22 @@
 
 
                     <form class="login-form" id="loginForm">
-                        <input type="text" id="usuario" class="input-field"
-                            placeholder="Teléfono, usuario o correo electrónico" autocomplete="username">
 
-                        <div class="password-container">
-                            <input type="password" id="password" class="input-field" placeholder="Contraseña"
+                        <div class="input-wrapper">
+                            <input type="text" id="usuario" class="input-field" placeholder=" " autocomplete="username">
+                            <span class="floating-label">Teléfono, usuario o correo electrónico</span>
+                        </div>
+
+                        <div class="input-wrapper password-container">
+                            <input type="password" id="password" class="input-field" placeholder=" "
                                 autocomplete="current-password">
+                            <span class="floating-label">Contraseña</span>
                             <button type="button" id="togglePassword">Mostrar</button>
                         </div>
 
                         <p id="mensaje-error" class="error-msg"></p>
 
-                       <button type="submit" class="login-button" id="boton">Iniciar sesión</button>
+                        <button type="submit" class="login-button" id="boton" disabled>Iniciar sesión</button>
 
                     </form>
 

